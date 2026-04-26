@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     exchange_api_primary: str = "https://economia.awesomeapi.com.br/json/last/USD-BRL"
     exchange_api_fallback: str = "https://api.frankfurter.app/latest?from=USD&to=BRL"
     exchange_cache_ttl: int = 300
+    log_level: str = "INFO"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

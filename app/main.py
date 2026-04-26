@@ -1,3 +1,5 @@
+import logging
+import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
@@ -5,7 +7,13 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.api.v1 import auth, vehicles
+from app.core.config import settings
+from app.core.logging_config import setup_logging
 from app.core.redis_client import close_redis, get_redis
+
+setup_logging(settings.log_level)
+
+logger = logging.getLogger("app")
 
 
 @asynccontextmanager
@@ -39,6 +47,15 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time.perf_counter()
+    response = await call_next(request)
+    duration_ms = (time.perf_counter() - start) * 1000
+    logger.info("%s %s %d %.0fms", request.method, request.url.path, response.status_code, duration_ms)
+    return response
 
 
 @app.exception_handler(RequestValidationError)

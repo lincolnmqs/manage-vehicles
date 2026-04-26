@@ -90,7 +90,7 @@ async def list_vehicles(
 
 
 @router.get(
-    "/{id}",
+    "/{vehicle_id}",
     response_model=VehicleOut,
     summary="Retorna os detalhes do veículo",
     description=(
@@ -131,7 +131,7 @@ async def create_vehicle(
 
 
 @router.put(
-    "/{id}",
+    "/{vehicle_id}",
     response_model=VehicleOut,
     summary="Atualiza os dados de um veículo",
     description=(
@@ -151,7 +151,7 @@ async def update_vehicle(
 
 
 @router.patch(
-    "/{id}",
+    "/{vehicle_id}",
     response_model=VehicleOut,
     summary="Atualiza parcialmente os dados de um veículo",
     description=(
@@ -171,7 +171,7 @@ async def patch_vehicle(
 
 
 @router.delete(
-    "/{id}",
+    "/{vehicle_id}",
     status_code=204,
     summary="Remove um veículo (soft delete)",
     description=(

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import math
 from decimal import Decimal
 from uuid import UUID
@@ -16,6 +17,8 @@ from app.schemas.vehicle import (
     VehicleUpdate,
 )
 from app.schemas.common import PaginatedResponse
+
+logger = logging.getLogger(__name__)
 
 
 class VehicleService:
@@ -48,8 +51,10 @@ class VehicleService:
     async def create(self, data: VehicleCreate) -> VehicleOut:
         existing = await self.repo.get_by_license_plate(data.license_plate)
         if existing is not None:
+            logger.warning("Tentativa de cadastro com placa duplicada: %s", data.license_plate)
             raise HTTPException(status_code=409, detail="Placa já cadastrada")
         vehicle = await self.repo.create(data)
+        logger.info("Veículo cadastrado: id=%s placa=%s", vehicle.id, vehicle.license_plate)
         return VehicleOut.model_validate(vehicle)
 
     async def update(self, vehicle_id: UUID, data: VehicleUpdate) -> VehicleOut:
@@ -59,6 +64,7 @@ class VehicleService:
         if data.license_plate != vehicle.license_plate:
             await self._check_license_plate(data.license_plate, vehicle_id)
         updated = await self.repo.update(vehicle, data.model_dump())
+        logger.info("Veículo atualizado (PUT): id=%s", vehicle_id)
         return VehicleOut.model_validate(updated)
 
     async def patch(self, vehicle_id: UUID, data: VehiclePatch) -> VehicleOut:
@@ -69,6 +75,7 @@ class VehicleService:
         if "license_plate" in patch_data and patch_data["license_plate"] != vehicle.license_plate:
             await self._check_license_plate(patch_data["license_plate"], vehicle_id)
         updated = await self.repo.update(vehicle, patch_data)
+        logger.info("Veículo atualizado (PATCH): id=%s campos=%s", vehicle_id, list(patch_data.keys()))
         return VehicleOut.model_validate(updated)
 
     async def delete(self, vehicle_id: UUID) -> None:
@@ -76,6 +83,7 @@ class VehicleService:
         if vehicle is None:
             raise HTTPException(status_code=404, detail="Veículo não encontrado")
         await self.repo.soft_delete(vehicle)
+        logger.info("Veículo removido (soft delete): id=%s placa=%s", vehicle_id, vehicle.license_plate)
 
     async def report_by_brand(self) -> list[BrandReport]:
         rows = await self.repo.count_by_brand()
@@ -84,6 +92,7 @@ class VehicleService:
     async def _check_license_plate(self, license_plate: str, exclude_id: UUID) -> None:
         existing = await self.repo.get_by_license_plate(license_plate)
         if existing is not None and existing.id != exclude_id:
+            logger.warning("Tentativa de atualização com placa duplicada: %s", license_plate)
             raise HTTPException(status_code=409, detail="Placa já cadastrada")
 
     def _to_out(self, vehicle, exchange_rate: float) -> VehicleOut:
