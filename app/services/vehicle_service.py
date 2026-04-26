@@ -48,14 +48,14 @@ class VehicleService:
             raise HTTPException(status_code=404, detail="Veículo não encontrado")
         return self._to_out(vehicle, exchange_rate)
 
-    async def create(self, data: VehicleCreate) -> VehicleOut:
+    async def create(self, data: VehicleCreate, exchange_rate: float) -> VehicleOut:
         existing = await self.repo.get_by_license_plate(data.license_plate)
         if existing is not None:
             logger.warning("Tentativa de cadastro com placa duplicada: %s", data.license_plate)
             raise HTTPException(status_code=409, detail="Placa já cadastrada")
         vehicle = await self.repo.create(data)
         logger.info("Veículo cadastrado: id=%s placa=%s", vehicle.id, vehicle.license_plate)
-        return VehicleOut.model_validate(vehicle)
+        return self._to_out(vehicle, exchange_rate)
 
     async def update(self, vehicle_id: UUID, data: VehicleUpdate) -> VehicleOut:
         vehicle = await self.repo.get_by_id(vehicle_id)

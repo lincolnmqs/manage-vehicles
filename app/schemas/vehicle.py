@@ -11,7 +11,7 @@ class VehicleCreate(BaseModel):
     year: int = Field(..., ge=1886, le=2100, examples=[2022])
     color: str = Field(..., min_length=1, max_length=50, examples=["Silver"])
     license_plate: str = Field(..., min_length=1, max_length=10, examples=["ABC1D23"])
-    price_usd: Decimal = Field(..., gt=0, decimal_places=2, examples=[["25000.00"]])
+    price_usd: Decimal = Field(..., gt=0, decimal_places=2, examples=["25000.00"])
 
 
 class VehicleUpdate(VehicleCreate):
@@ -24,7 +24,7 @@ class VehiclePatch(BaseModel):
     year: int | None = Field(None, ge=1886, le=2100, examples=[2023])
     color: str | None = Field(None, min_length=1, max_length=50, examples=["Black"])
     license_plate: str | None = Field(None, min_length=1, max_length=10, examples=["XYZ9W87"])
-    price_usd: Decimal | None = Field(None, gt=0, decimal_places=2, examples=[["22000.00"]])
+    price_usd: Decimal | None = Field(None, gt=0, decimal_places=2, examples=["22000.00"])
 
 
 class VehicleOut(BaseModel):

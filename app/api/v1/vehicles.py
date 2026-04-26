@@ -127,7 +127,8 @@ async def create_vehicle(
     service: VehicleService = Depends(get_service),
     _: User = Depends(require_admin),
 ):
-    return await service.create(payload)
+    exchange_rate = await get_usd_to_brl_rate()
+    return await service.create(payload, exchange_rate)
 
 
 @router.put(

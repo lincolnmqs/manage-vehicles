@@ -39,7 +39,7 @@ async def test_create_vehicle_duplicate_license_plate_raises_409():
         await service.create(VehicleCreate(
             brand="Honda", model="Civic", year=2021,
             color="Black", license_plate="ABC1234", price_usd=Decimal("15000"),
-        ))
+        ), exchange_rate=5.0)
 
     assert exc_info.value.status_code == 409
 
