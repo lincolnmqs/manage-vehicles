@@ -55,7 +55,7 @@ class VehicleRepository:
 
     async def get_by_license_plate(self, license_plate: str) -> Vehicle | None:
         result = await self.session.execute(
-            select(Vehicle).where(Vehicle.license_plate == license_plate)
+            select(Vehicle).where(Vehicle.license_plate == license_plate, Vehicle.active.is_(True))
         )
         return result.scalar_one_or_none()
 
