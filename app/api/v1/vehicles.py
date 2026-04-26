@@ -20,7 +20,7 @@ from app.schemas.vehicle import (
 from app.schemas.common import PaginatedResponse
 from app.services.vehicle_service import VehicleService
 
-router = APIRouter(prefix="/veiculos", tags=["veiculos"])
+router = APIRouter(prefix="/vehicles", tags=["vehicles"])
 
 
 def get_service(db: AsyncSession = Depends(get_db)) -> VehicleService:
@@ -28,7 +28,7 @@ def get_service(db: AsyncSession = Depends(get_db)) -> VehicleService:
 
 
 @router.get(
-    "/relatorios/por-marca",
+    "/reports/by-brand",
     response_model=list[BrandReport],
     summary="Retorna relatório de quantidade de veículos agrupados por marca",
     description=(
